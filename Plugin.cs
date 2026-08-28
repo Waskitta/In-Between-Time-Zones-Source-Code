@@ -84,7 +84,7 @@ namespace BaldiPlusRandomZone
 
         private IEnumerator PreLoad()
         {
-            yield return 1;
+            yield return 5;
             yield return "Pre-loading Zones+";
 
             BinaryReader reader = new BinaryReader(File.OpenRead(Path.Combine(AssetLoader.GetModPath(this), "ZonePit.bpl")));
@@ -108,6 +108,8 @@ namespace BaldiPlusRandomZone
             level.levelAsset.rooms[1].roomFunctionContainer = saveAndQuitContainer;
 
             assetMan.Add("ZonePitStop", level);
+
+            yield return "Loading Custom Textures...";
 
             RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Wall);
             RoomTexturesHandler.LoadTextures(RoomCategory.Class, CellTexturePart.Wall);
@@ -148,8 +150,10 @@ namespace BaldiPlusRandomZone
             assetMan.Add("ZoneManager", zoneManager);
             assetMan.Add("LobbyMusic", AssetLoader.MidiFromMod("LobbyMusic", this, "ZoneLobby.midi"));
 
+            yield return "Loading Replacement NPCs...";
             CharacterCreator.LoadAllNPCs();
 
+            yield return "Loading Custom Room Assets...";
             string roomFolder = Path.Combine(AssetLoader.GetModPath(this), "RoomAssets");
 
             assetPlusMan.AddFromResourcesNoClones<GameObject>();
@@ -159,27 +163,64 @@ namespace BaldiPlusRandomZone
                 using (BinaryReader roomReader = new BinaryReader(File.OpenRead(file)))
                 {
                     var room = LevelImporter.CreateRoomAsset(BaldiRoomAsset.Read(roomReader), false);
-                    room.posters = AssetFinder.FindAllOfType<RoomAsset>(true).LastOrDefault(x => x.category == room.category && (!x.hasActivity || x.activity.prefab == room.activity.prefab)).posters;
-                    room.posterChance = AssetFinder.FindAllOfType<RoomAsset>(true).LastOrDefault(x => x.category == room.category && (!x.hasActivity || x.activity.prefab.GetType() == room.activity.prefab.GetType())).posterChance;
-
-                    if (room.category == RoomCategory.Class)
-                        room.roomFunctionContainer = AssetFinder.FindAllOfType<RoomAsset>(true).First(x => x.activity.prefab == room.activity.prefab).roomFunctionContainer;
-
                     room.name = Path.GetFileNameWithoutExtension(file);
 
-                    room.basicSwaps.Add(new BasicObjectSwapData
+                    RoomAsset matchingRoom = AssetFinder.FindAllOfType<RoomAsset>(true).LastOrDefault(x => x.category == room.category && x.posters != null && x.posters.Count > 0 && (!room.hasActivity || (x.activity != null && room.activity != null && x.activity.prefab == room.activity.prefab)));
+
+                    if (matchingRoom != null)
+                    {
+                        room.posters = matchingRoom.posters;
+                        room.posterChance = matchingRoom.posterChance;
+
+                        if (room.category == RoomCategory.Class)
+                            room.roomFunctionContainer = matchingRoom.roomFunctionContainer;
+                    }
+                    else
+                        Debug.LogWarning("Don't Have Matching Room:" + room.name);
+
+                    room.basicSwaps.AddRange([new BasicObjectSwapData
                     {
                         prefabToSwap = assetPlusMan.Get<GameObject>("SodaMachine").transform,
                         potentialReplacements = new WeightedTransform[] 
                         { 
-                            new WeightedTransform { selection = assetPlusMan.Get<GameObject>("SodaMachine").transform, weight = 25 },
+                            new WeightedTransform { selection = assetPlusMan.Get<GameObject>("SodaMachine").transform, weight = 15 },
                             new WeightedTransform { selection = assetPlusMan.Get<GameObject>("ZestyMachine").transform, weight = 100 },
                             new WeightedTransform { selection = assetPlusMan.Get<GameObject>("DietSodaMachine").transform, weight = 100 },
                             new WeightedTransform { selection = assetPlusMan.Get<GameObject>("CrazyVendingMachineZesty").transform, weight = 5 },
                             new WeightedTransform { selection = assetPlusMan.Get<GameObject>("CrazyVendingMachineBSODA").transform, weight = 5 }
                         },
                         chance = 1f
-                    });
+                    },
+                    new BasicObjectSwapData
+                    {
+                        prefabToSwap = assetPlusMan.Get<GameObject>("Locker").transform,
+                        potentialReplacements = new WeightedTransform[]
+                        {
+                            new WeightedTransform { selection = assetPlusMan.Get<GameObject>("Locker").transform, weight = 100 },
+                            new WeightedTransform { selection = assetPlusMan.Get<GameObject>("BlueLocker").transform, weight = 25 }
+                        },
+                        chance = 0.75f
+                    },
+                    new BasicObjectSwapData
+                    {
+                        prefabToSwap = assetPlusMan.Get<GameObject>("MyComputer").transform,
+                        potentialReplacements = new WeightedTransform[]
+                        {
+                            new WeightedTransform { selection = assetPlusMan.Get<GameObject>("MyComputer_Off").transform, weight = 100 },
+                            new WeightedTransform { selection = assetPlusMan.Get<GameObject>("MyComputer").transform, weight = 55 }
+                        },
+                        chance = 0.96f
+                    },
+                    new BasicObjectSwapData
+                    {
+                        prefabToSwap = assetPlusMan.Get<GameObject>("Bookshelf_Object").transform,
+                        potentialReplacements = new WeightedTransform[]
+                        {
+                            new WeightedTransform { selection = assetPlusMan.Get<GameObject>("Bookshelf_Object").transform, weight = 100 },
+                            new WeightedTransform { selection = assetPlusMan.Get<GameObject>("Bookshelf_Hole_Object").transform, weight = 40 }
+                        },
+                        chance = 0.25f
+                    }]);
 
                     EndlessZoneManager.customRoomAssets.Add(room);
                     roomReader.Close();
@@ -195,7 +236,7 @@ namespace BaldiPlusRandomZone
             foreach (string path in woodPaths)
             {
                 string name = Path.GetFileNameWithoutExtension(path);
-                Debug.Log(name);
+                //Debug.Log(name);
                 if (name.StartsWith("Wood_"))
                 {
                     var texture = AssetLoader.TextureFromFile(path);
@@ -207,6 +248,7 @@ namespace BaldiPlusRandomZone
 
             AssetLoader.LocalizationFromMod(this);
 
+            yield return "Loading Menu...";
             CustomModesHandler.OnMainMenuInitialize += () =>
             {
                 var mainScreen = ModeObject.CreateModeObjectOverExistingScreen(SelectionScreen.MainScreen);
