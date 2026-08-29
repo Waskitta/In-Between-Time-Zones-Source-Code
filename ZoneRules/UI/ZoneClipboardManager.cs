@@ -25,6 +25,7 @@ namespace BaldiPlusRandomZone.ZoneRules.UI
                 buttons[i].image.sprite = Plugin.assetMan.Get<Sprite>("Drawing_" + chosenZoneRules[i].category.ToString());
             }
 
+            Singleton<CoreGameManager>.Instance.disablePause = true;
             ZonePitStopManager.SetSilenceMusic(true);
         }
 
@@ -46,6 +47,7 @@ namespace BaldiPlusRandomZone.ZoneRules.UI
             int index = buttons.IndexOf(button);
             Singleton<EndlessZoneManager>.Instance.zoneRules.Add(chosenZoneRules[index]);
             Singleton<MusicManager>.Instance.PlaySoundEffect(Plugin.assetMan.Get<SoundObject>("PaperApplySound"));
+            Singleton<CoreGameManager>.Instance.disablePause = false;
             manager.CloseSelectScreen();
         }
 

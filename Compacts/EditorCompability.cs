@@ -18,7 +18,7 @@ namespace BaldiPlusRandomZone.Compacts
         {
             AddNPC("bussinesman", "npc_bussinessman", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "BussinesMan").replacement);
             AddNPC("educatedtime", "npc_educatedtime", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "EducatedTime").replacement);
-            AddNPC("classicsweep", "npc_classicsweep", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "ClassicSweep").replacement);
+            AddNPC("zoneclassicsweep", "npc_classicsweep", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "ClassicSweep").replacement);
             AddNPC("caffeinepomp", "npc_caffinatedpomp", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "CaffeinePomp").replacement);
             AddNPC("goodguy", "npc_goodguy", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "GoodGuy").replacement);
             AddNPC("cloudya", "npc_cloudya", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "Cloudya").replacement);
