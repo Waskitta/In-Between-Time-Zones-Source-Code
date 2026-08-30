@@ -14,6 +14,11 @@ namespace BaldiPlusRandomZone.ZoneRules
 
             level.minSize = new(minX, 1);
             level.maxSize = new(maxX, 1);
+
+            level.minPostPlotSpecialHalls = 0;
+            level.maxPostPlotSpecialHalls = 0;
+            level.minPrePlotSpecialHalls = 0;
+            level.maxPrePlotSpecialHalls = 0;
         }
 
         public override void LoadPreparation(Random random)

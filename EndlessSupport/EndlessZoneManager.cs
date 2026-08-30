@@ -54,69 +54,124 @@ namespace BaldiPlusRandomZone.EndlessSupport
 
         public IEnumerator CreateNextZone()
         {
-            var random = new System.Random(Singleton<CoreGameManager>.Instance.Seed() + currentZone);
+            var core = Singleton<CoreGameManager>.Instance;
+            var random = new System.Random(core.Seed() + currentZone);
+
             currentLevel = Instantiate(currentLevelData.level);
             yield return null;
-            currentLevel.hallWallTexs = currentLevel.hallWallTexs.AddRangeToArray(RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Wall));
-            yield return null;
-            currentLevel.hallFloorTexs = currentLevel.hallFloorTexs.AddRangeToArray(RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Floor));
-            yield return null;
-            currentLevel.hallCeilingTexs = currentLevel.hallCeilingTexs.AddRangeToArray(RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Ceiling));
+
+            var hallWalls = RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Wall);
             yield return null;
 
-            currentLevel.SetCustomModValue(Plugin.instance.Info, "WoodTextures", Plugin.assetMan.GetAll<Texture2D>().Where(x => x.name.StartsWith("Wood_")).ToArray());
+            var hallFloors = RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Floor);
+            yield return null;
+
+            var hallCeilings = RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Ceiling);
+            yield return null;
+
+            currentLevel.hallWallTexs = currentLevel.hallWallTexs.AddRangeToArray(hallWalls);
+            yield return null;
+
+            currentLevel.hallFloorTexs = currentLevel.hallFloorTexs.AddRangeToArray(hallFloors);
+            yield return null;
+
+            currentLevel.hallCeilingTexs = currentLevel.hallCeilingTexs.AddRangeToArray(hallCeilings);
+            yield return null;
 
             foreach (RoomGroup group in currentLevel.roomGroup)
             {
                 if (group.name == "Class")
                 {
                     group.wallTexture = group.wallTexture.AddRangeToArray(RoomTexturesHandler.LoadTextures(RoomCategory.Class, CellTexturePart.Wall));
-                    group.floorTexture = group.floorTexture.AddRangeToArray(RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Floor));
-                    group.potentialRooms = group.potentialRooms.AddRangeToArray(customRoomAssets.Where(x => x.category == RoomCategory.Class && ContainsActivity(x.activity.prefab, group.potentialRooms)).Select(x => WeightRoomBasedOnArray(x, group.potentialRooms)).ToArray());
+                    yield return null;
+
+                    group.floorTexture = group.floorTexture.AddRangeToArray(hallFloors);
+                    yield return null;
+
+                    var rooms = customRoomAssets.Where(x =>x.category == RoomCategory.Class && ContainsActivity(x.activity.prefab, group.potentialRooms)).Select(x => WeightRoomBasedOnArray(x, group.potentialRooms)).ToArray();
+                    group.potentialRooms =  group.potentialRooms.AddRangeToArray(rooms);
                     yield return null;
                 }
                 else if (group.name == "Faculty" || group.name == "LockedRoom")
                 {
-                    group.wallTexture = group.wallTexture.AddRangeToArray(RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Wall));
-                    group.wallTexture = group.wallTexture.AddRangeToArray(RoomTexturesHandler.LoadTextures(RoomCategory.Faculty, CellTexturePart.Wall));
-                    group.floorTexture = group.floorTexture.AddRangeToArray(RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Floor));
+                    group.wallTexture = group.wallTexture.AddRangeToArray(hallWalls);
+
+                    yield return null;
+                    var facultyWalls = RoomTexturesHandler.LoadTextures(RoomCategory.Faculty, CellTexturePart.Wall);
+
+                    group.wallTexture = group.wallTexture.AddRangeToArray(facultyWalls);
+                    yield return null;
+
+                    group.floorTexture = group.floorTexture.AddRangeToArray(hallFloors);
+                    yield return null;
 
                     if (group.name != "LockedRoom")
-                        group.potentialRooms = group.potentialRooms.AddRangeToArray(customRoomAssets.Where(x => x.category == RoomCategory.Faculty).Select(x => WeightRoomBasedOnArray(x, group.potentialRooms)).ToArray());
-                    yield return null;
+                    {
+                        var rooms = customRoomAssets.Where(x => x.category == RoomCategory.Faculty).Select(x => WeightRoomBasedOnArray(x, group.potentialRooms)).ToArray();
+                        group.potentialRooms = group.potentialRooms.AddRangeToArray(rooms);
+                        yield return null;
+                    }
                 }
                 else if (group.name == "Office")
                 {
-                    group.wallTexture = group.wallTexture.AddRangeToArray(RoomTexturesHandler.LoadTextures(RoomCategory.Class, CellTexturePart.Wall));
-                    group.floorTexture = group.floorTexture.AddRangeToArray(RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Floor));
-                    group.potentialRooms = group.potentialRooms.AddRangeToArray(customRoomAssets.Where(x => x.category == RoomCategory.Office).Select(x => WeightRoomBasedOnArray(x, group.potentialRooms)).ToArray());
+                    var classWalls = RoomTexturesHandler.LoadTextures(RoomCategory.Class, CellTexturePart.Wall);
+                    group.wallTexture = group.wallTexture.AddRangeToArray(classWalls);
+                    yield return null;
+
+                    group.floorTexture = group.floorTexture.AddRangeToArray(hallFloors);
+                    yield return null;
+
+                    var rooms = customRoomAssets.Where(x => x.category == RoomCategory.Office).Select(x => WeightRoomBasedOnArray(x, group.potentialRooms)).ToArray();
+                    group.potentialRooms = group.potentialRooms.AddRangeToArray(rooms);
                     yield return null;
                 }
 
-                group.ceilingTexture = group.ceilingTexture.AddRangeToArray(RoomTexturesHandler.LoadTextures(RoomCategory.Hall, CellTexturePart.Ceiling));
+                group.ceilingTexture = group.ceilingTexture.AddRangeToArray(hallCeilings);
+
                 yield return null;
             }
 
             List<WeightedNPC> potentialNpcs = new List<WeightedNPC>();
 
             foreach (WeightedNPC npc in GetPotentialNPCs())
-                potentialNpcs.Add(new WeightedNPC { selection = GetReplacementCharacter(npc.selection, random), weight = npc.weight });
+            {
+                potentialNpcs.Add(new WeightedNPC
+                {
+                    selection = GetReplacementCharacter(npc.selection, random),
+                    weight = npc.weight
+                });
 
-            int target = Mathf.RoundToInt(Mathf.Pow(1.25f, currentZone));
+                yield return null;
+            }
+
+            int target = Mathf.RoundToInt(Mathf.Pow(1.12f, currentZone));
+            yield return null;
+
             currentScene = ScriptableObject.CreateInstance<SceneObject>();
+
             currentScene.levelObject = currentLevel;
             currentScene.levelNo = currentZone;
             currentScene.levelTitle = "Z" + currentZone;
             currentScene.manager = Plugin.assetMan.Get<BaseGameManager>("ZoneManager");
+            yield return null;
+
             currentScene.skybox = AssetFinder.FindOfTypeWithName<Cubemap>("Cubemap_Twilight", true);
+            yield return null;
+
             currentScene.baldiPrefab = currentLevelData.mainBaldi;
-            currentScene.additionalNPCs = target + 1;
-            currentScene.name = "ZoneScene_" + currentZone;
             currentScene.potentialNPCs = potentialNpcs;
-            currentScene.shopItems = GetShopItems();
-            currentScene.totalShopItems = currentLevelData.shopItemCount;
-            currentScene.potentialStickers = GetStickers();
+            currentScene.additionalNPCs =  Mathf.Min(target + 1, potentialNpcs.Count);
             currentScene.forcedNpcs = [GetReplacementCharacter(NPCMetaStorage.Instance.Get(Character.Principal).value, random)];
+            currentScene.name = "ZoneScene_" + currentZone;
+
+            yield return null;
+            currentScene.shopItems = GetShopItems();
+
+            yield return null;
+            currentScene.totalShopItems = currentLevelData.shopItemCount;
+            currentScene.potentialStickers =  GetStickers();
+
+            yield return null;
 
             foreach (ZoneRule rule in zoneRules)
             {
@@ -503,7 +558,11 @@ namespace BaldiPlusRandomZone.EndlessSupport
             new ZoneRule_BlueLocker(40, 60),
             new ZoneRule_WaterFountain(60, 50),
             new ZoneRule_StudentsLost(40, 50),
-            new ZoneRule_ValuablePoints(50, 60)
+            new ZoneRule_ValuablePoints(50, 60),
+            new ZoneRule_ActivityOverride(ZoneRuleCategory.NotebookOverride, ZoneRuleType.Positive, 80),
+            new ZoneRule_ActivityOverride(ZoneRuleCategory.MathMachineOverride, ZoneRuleType.Positive, 60),
+            new ZoneRule_ActivityOverride(ZoneRuleCategory.BalloonBusterOverride, ZoneRuleType.Negative, 55),
+            new ZoneRule_ActivityOverride(ZoneRuleCategory.MatchMachineOverride, ZoneRuleType.Negative, 999960)
         };
 
         public static Dictionary<Items, List<WeightedItemObject>> shopItems = new Dictionary<Items, List<WeightedItemObject>>();

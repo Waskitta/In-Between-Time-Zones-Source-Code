@@ -16,6 +16,15 @@ namespace BaldiPlusRandomZone.ZoneRules
 
             level.minSize = new(Mathf.FloorToInt(level.minSize.x * multiplier), Mathf.FloorToInt(level.minSize.z * multiplier));
             level.maxSize = new(Mathf.FloorToInt(level.maxSize.x * multiplier), Mathf.FloorToInt(level.maxSize.z * multiplier));
+
+            if (multiplier == 0.45f)
+            {
+                foreach (RoomGroup group in level.roomGroup)
+                {
+                    group.stickToHallChance =- 0.05f;
+                    group.stickToHallChance = Mathf.Max(0f, group.stickToHallChance);
+                }
+            }
         }
 
         public override void LoadPreparation(System.Random random)

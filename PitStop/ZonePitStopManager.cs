@@ -44,7 +44,12 @@ namespace BaldiPlusRandomZone.PitStop
                 {
                     manager.LoadFile(ZoneLevelSelectMenu.selectedLevel, ZoneLevelSelectMenu.lifeMode);
                     manager.Load();
-                    Singleton<CoreGameManager>.Instance.lastLevelNumber = Singleton<EndlessZoneManager>.Instance.currentZone;
+
+                    if (manager.loadedSaveFile.attempts < 2)
+                        Singleton<CoreGameManager>.Instance.lastLevelNumber = Singleton<EndlessZoneManager>.Instance.currentZone;
+                    else
+                        Singleton<CoreGameManager>.Instance.lastLevelNumber = Singleton<EndlessZoneManager>.Instance.currentZone - 1;
+
                     manager.DeleteFile(ZoneLevelSelectMenu.selectedLevel, ZoneLevelSelectMenu.lifeMode);
                 }
             }
@@ -186,6 +191,7 @@ namespace BaldiPlusRandomZone.PitStop
                     {
                         room.doors = FindObjectsOfType<Door>().Where(x => x.name == "Door_Auto(Clone)").ToList();
                         room.functions.GetComponent<StoreRoomFunction>().ReflectionInvoke("Close", []);
+                        return;
                     }
 
                     room.itemSpawnPoints.AddRange(Plugin.assetPlusMan.Get<RoomAsset>("Room_JohnnysStore").itemSpawnPoints);

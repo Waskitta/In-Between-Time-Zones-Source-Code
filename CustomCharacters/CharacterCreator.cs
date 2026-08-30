@@ -1,4 +1,5 @@
 ﻿using MTM101BaldAPI;
+using MTM101BaldAPI.Reflection;
 using MTM101BaldAPI.Registers;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,46 +10,49 @@ namespace BaldiPlusRandomZone.CustomCharacters
     {
         public static void LoadAllNPCs()
         {
-            var bussinesMan = CreateCharacterDuplicate((Principal)NPCMetaStorage.Instance.Get(Character.Principal).value, "BussinesMan");
-            bussinesMan.gameObject.AddComponent<Reskin_Businessman>().Initialize(bussinesMan);
+            var bussinesMan = CreateCharacterDuplicate<Principal, Reskin_Businessman>((Principal)NPCMetaStorage.Instance.Get(Character.Principal).value, "BussinesMan");
             replacementCharacters.Add(new(Character.Principal, bussinesMan, 45, "BussinesMan"));
 
-            var educatedTime = CreateCharacterDuplicate((Playtime)NPCMetaStorage.Instance.Get(Character.Playtime).value, "EducatedTime");
-            educatedTime.gameObject.AddComponent<Reskin_EducatedTime>().Initialize(educatedTime);
+            var educatedTime = CreateCharacterDuplicate<Playtime, Reskin_EducatedTime>((Playtime)NPCMetaStorage.Instance.Get(Character.Playtime).value, "EducatedTime");
             replacementCharacters.Add(new(Character.Playtime, educatedTime, 60, "EducatedTime"));
 
-            var classicSweep = CreateCharacterDuplicate((GottaSweep)NPCMetaStorage.Instance.Get(Character.Sweep).value, "ClassicSweep");
-            classicSweep.gameObject.AddComponent<Reskin_ClassicSweep>().Initialize(classicSweep);
+            var classicSweep = CreateCharacterDuplicate<GottaSweep, Reskin_ClassicSweep>((GottaSweep)NPCMetaStorage.Instance.Get(Character.Sweep).value, "ClassicSweep");
             replacementCharacters.Add(new(Character.Sweep, classicSweep, 50, "ClassicSweep"));
 
-            var caffeinePomp = CreateCharacterDuplicate((NoLateTeacher)NPCMetaStorage.Instance.Get(Character.Pomp).value, "CaffeinePomp");
-            caffeinePomp.gameObject.AddComponent<Reskin_CaffeinatedPomp>().Initialize(caffeinePomp);
+            var caffeinePomp = CreateCharacterDuplicate<NoLateTeacher, Reskin_CaffeinatedPomp>((NoLateTeacher)NPCMetaStorage.Instance.Get(Character.Pomp).value, "CaffeinePomp");
             replacementCharacters.Add(new(Character.Pomp, caffeinePomp, 50, "CaffeinePomp"));
 
-            var goodGuy = CreateCharacterDuplicate((Bully)NPCMetaStorage.Instance.Get(Character.Bully).value, "GoodGuy");
-            goodGuy.gameObject.AddComponent<Reskin_GoodGuy>().Initialize(goodGuy);
+            var goodGuy = CreateCharacterDuplicate<Bully, Reskin_GoodGuy>((Bully)NPCMetaStorage.Instance.Get(Character.Bully).value, "GoodGuy");
             replacementCharacters.Add(new(Character.Bully, goodGuy, 40, "GoodGuy"));
 
-            var cloudya = CreateCharacterDuplicate((Cumulo)NPCMetaStorage.Instance.Get(Character.Cumulo).value, "Cloudya");
-            cloudya.gameObject.AddComponent<Reskin_Cloudya>().Initialize(cloudya);
+            var cloudya = CreateCharacterDuplicate<Cumulo, Reskin_Cloudya>((Cumulo)NPCMetaStorage.Instance.Get(Character.Cumulo).value, "Cloudya");
             replacementCharacters.Add(new(Character.Cumulo, cloudya, 60, "Cloudya"));
 
-            var coolBeans = CreateCharacterDuplicate((Beans)NPCMetaStorage.Instance.Get(Character.Beans).value, "CoolBeans");
-            coolBeans.gameObject.AddComponent<Reskin_CoolBeans>().Initialize(coolBeans);
+            var coolBeans = CreateCharacterDuplicate<Beans, Reskin_CoolBeans>((Beans)NPCMetaStorage.Instance.Get(Character.Beans).value, "CoolBeans");
             replacementCharacters.Add(new(Character.Beans, coolBeans, 30, "CoolBeans"));
 
-            var chalkDemon = CreateCharacterDuplicate((ChalkFace)NPCMetaStorage.Instance.Get(Character.Chalkles).value, "Chalk-Demon");
-            chalkDemon.gameObject.AddComponent<Reskin_ChalkDemon>().Initialize(chalkDemon);
-            replacementCharacters.Add(new(Character.Chalkles, chalkDemon, 35, "Chalk-Demon"));
+            var chalkDemon = CreateCharacterDuplicate<ChalkFace, Reskin_ChalkDemon>((ChalkFace)NPCMetaStorage.Instance.Get(Character.Chalkles).value, "Chalk-Demon");
+            replacementCharacters.Add(new(Character.Chalkles, chalkDemon, 35, "ChalkDemon"));
         }
 
-        internal static T CreateCharacterDuplicate<T>(T toClone, string name) where T : NPC
+        internal static T CreateCharacterDuplicate<T, R>(T toClone, string name) where T : NPC where R : NpcReskinBase
         {
             GameObject dummyObj = new GameObject();
             dummyObj.SetActive(false);
             T newNpc = GameObject.Instantiate<T>(toClone, dummyObj.transform);
             newNpc.gameObject.ConvertToPrefab(true);
             newNpc.name = name;
+
+            Character metaEnum = EnumExtensions.ExtendEnum<Character>(name);
+            newNpc.ReflectionSetVariable("character", metaEnum);
+            newNpc.AddMeta(Plugin.instance, toClone.GetMeta().flags);
+            newNpc.GetMeta().tags.Add("custom_mode_force_npc_in_list");
+
+            var reskin = newNpc.gameObject.AddComponent<R>();
+            reskin.Initialize(newNpc);
+
+            newNpc.GetMeta().nameLocalizationKey = reskin.npc.Poster.textData[0].textKey;
+
             Object.Destroy(dummyObj);
             return newNpc;
         }

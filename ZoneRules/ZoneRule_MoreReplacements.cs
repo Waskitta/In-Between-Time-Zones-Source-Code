@@ -62,6 +62,6 @@ namespace BaldiPlusRandomZone.ZoneRules
 
         public override ZoneRuleCategory category => ZoneRuleCategory.MoreReplacements;
         public override float positivePowerBonus => 1.2f;
-        public override float negativePowerBonus => 1.7f;
+        public override float negativePowerBonus => 1.65f;
     }
 }

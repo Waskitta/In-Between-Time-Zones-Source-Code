@@ -382,6 +382,6 @@ namespace BaldiPlusRandomZone
     {
         public const string PLUGIN_GUID = "wazkitta.plusmod.pluszones";
         public const string PLUGIN_NAME = "In-Between Time-Zones";
-        public const string PLUGIN_VERSION = "1.01";
+        public const string PLUGIN_VERSION = "1.02";
     }
 }

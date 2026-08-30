@@ -23,7 +23,7 @@ namespace BaldiPlusRandomZone.Compacts
             AddNPC("goodguy", "npc_goodguy", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "GoodGuy").replacement);
             AddNPC("cloudya", "npc_cloudya", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "Cloudya").replacement);
             AddNPC("coolbeans", "npc_coolbeans", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "CoolBeans").replacement);
-            AddNPC("chalkdemon", "npc_demonchalk", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "Chalk-Demon").replacement);
+            AddNPC("chalkdemon", "npc_demonchalk", CharacterCreator.replacementCharacters.FirstOrDefault(x => x.name == "ChalkDemon").replacement);
 
             foreach (var textureSet in RoomTexturesHandler.textures.Values)
             {

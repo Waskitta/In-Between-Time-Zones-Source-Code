@@ -64,7 +64,11 @@ namespace BaldiPlusRandomZone.ZoneRules
         MoreReplacements,
         BlueLocker,
         WaterFountain,
-        ValuablePoints
+        ValuablePoints,
+        NotebookOverride,
+        MathMachineOverride,
+        BalloonBusterOverride,
+        MatchMachineOverride
     }
 
     public enum ZoneRuleType
