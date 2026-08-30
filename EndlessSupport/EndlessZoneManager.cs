@@ -541,7 +541,7 @@ namespace BaldiPlusRandomZone.EndlessSupport
             new ZoneRule_NoMap(46),
             new ZoneRule_OpenHallways(50),
             new ZoneRule_OutlineRooms(56),
-            new ZoneRule_ConveyorBelts(40),
+            new ZoneRule_ConveyorBelts(40 * 99),
             new ZoneRule_BrokenWindows(50),
             new ZoneRule_ExtraWindow(50, 40),
             new ZoneRule_DebugRooms(45),
@@ -562,7 +562,7 @@ namespace BaldiPlusRandomZone.EndlessSupport
             new ZoneRule_ActivityOverride(ZoneRuleCategory.NotebookOverride, ZoneRuleType.Positive, 80),
             new ZoneRule_ActivityOverride(ZoneRuleCategory.MathMachineOverride, ZoneRuleType.Positive, 60),
             new ZoneRule_ActivityOverride(ZoneRuleCategory.BalloonBusterOverride, ZoneRuleType.Negative, 55),
-            new ZoneRule_ActivityOverride(ZoneRuleCategory.MatchMachineOverride, ZoneRuleType.Negative, 999960)
+            new ZoneRule_ActivityOverride(ZoneRuleCategory.MatchMachineOverride, ZoneRuleType.Negative, 60)
         };
 
         public static Dictionary<Items, List<WeightedItemObject>> shopItems = new Dictionary<Items, List<WeightedItemObject>>();

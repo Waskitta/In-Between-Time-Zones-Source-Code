@@ -1,4 +1,5 @@
 ﻿using MTM101BaldAPI.Reflection;
+using MTM101BaldAPI.Registers;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,6 +19,12 @@ namespace BaldiPlusRandomZone.ZoneRules
             structure.Initialize(lb.Ec, new());
             structure.ReflectionSetVariable("beltSpeed", 15f);
             structure.Load(GenerateBeltStructureData(lb, random));
+
+            foreach (BeltManager belt in structure.builtBelts)
+            {
+                belt.ReflectionSetVariable("blockNavigation", true);
+                belt.SetRunning(true);
+            }
         }
 
         public override void ModifyLevelObject(LevelGenerationParameters level, int levelId)
@@ -28,7 +35,10 @@ namespace BaldiPlusRandomZone.ZoneRules
             {
                 if (item.selection.itemType == Items.Boots)
                     item.weight = Mathf.CeilToInt(item.weight * 1.5f);
-            }    
+            }
+
+            for (int i = 0; i < 2; i++)
+                level.forcedItems.Add(ItemMetaStorage.Instance.FindByEnum(Items.Boots).value);
         }
 
         private static List<StructureData> GenerateBeltStructureData(LevelBuilder lb, System.Random random)
